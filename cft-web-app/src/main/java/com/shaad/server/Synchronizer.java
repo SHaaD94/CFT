@@ -37,6 +37,7 @@ public class Synchronizer {
     @Autowired
     private OfficeDAO officeDAO;
 
+    private boolean isSynchroinized = false;
 
     private final String WEB_SERVICE_URL;
 
@@ -131,6 +132,7 @@ public class Synchronizer {
     public void synchronizeDataBase() {
         List<Bank> webServiceBankList = parseIntoBankList(getBankList());
         if (null == webServiceBankList || webServiceBankList.isEmpty()) {
+            isSynchroinized = false;
             return;
         }
         List<Bank> currentBankList = bankDAO.getAllBank();
@@ -170,6 +172,7 @@ public class Synchronizer {
                 officeDAO.save(office);
             }
         }
+        isSynchroinized = true;
     }
 
     private class SynchTask implements Runnable {
@@ -177,7 +180,9 @@ public class Synchronizer {
             try {
                 synchronizeDataBase();
             } finally {
-                logger.info("Database synchronized " + new Date().toString());
+                if (isSynchroinized) {
+                    logger.info("Database synchronized " + new Date().toString());
+                }
                 SCHEDULER.schedule(new SynchTask(), SCHEDULE_DELAY, TimeUnit.MINUTES);
             }
         }
