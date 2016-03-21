@@ -44,8 +44,8 @@ public class BankDAOImpl implements BankDAO {
 
     @Override
     public List<Bank> getBanksByCity(String city) {
-        return sessionFactory.getCurrentSession().createQuery("select b from Bank b join b.officeList o" +
-                "    where o.city = ?").setString(0, city).list();
+        return sessionFactory.getCurrentSession().createQuery("select distinct b from Bank b join "
+                + " fetch b.officeList o where o.city = ?").setString(0, city).list();
     }
 
     @Override
